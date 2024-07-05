@@ -45,10 +45,12 @@ public class FormularioAlunoActivity extends AppCompatActivity {
         botaoSalvar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view){
-//                Aluno alunoCriado = preencherAluno();
-//                salvarAluno(alunoCriado);
                 preencherAluno();
-                alunoDAO.editar(aluno);
+                if(aluno.temIdValido()) {
+                    alunoDAO.editar(aluno);
+                } else {
+                    alunoDAO.salvar(aluno);
+                }
                 finish();
             }
         });
@@ -58,11 +60,6 @@ public class FormularioAlunoActivity extends AppCompatActivity {
         campoNome = findViewById(R.id.activity_formulario_aluno_nome_et);
         campoTelefone = findViewById(R.id.activity_formulario_aluno_telefone_et);
         campoEmail = findViewById(R.id.activity_formulario_aluno_email_et);
-    }
-
-    private void salvarAluno(Aluno novoAluno) {
-        alunoDAO.salvar(novoAluno);
-        finish();
     }
 
     private void preencherAluno() {
