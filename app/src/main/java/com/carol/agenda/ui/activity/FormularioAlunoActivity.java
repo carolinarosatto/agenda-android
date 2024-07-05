@@ -1,10 +1,11 @@
 package com.carol.agenda.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.carol.agenda.R;
@@ -18,6 +19,7 @@ public class FormularioAlunoActivity extends AppCompatActivity {
     private EditText campoTelefone;
     private EditText campoEmail;
     final AlunoDAO alunoDAO = new AlunoDAO();
+    private Aluno aluno;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,13 +28,29 @@ public class FormularioAlunoActivity extends AppCompatActivity {
         setTitle(TITULO_APPBAR_FORMULARIO);
         inicializacaoDosCampos();
         configurarBotaoSalvar();
+
+        Intent dados = getIntent();
+        if(dados.hasExtra("aluno")) {
+            aluno = (Aluno) dados.getSerializableExtra("aluno");
+            campoNome.setText(aluno != null ? aluno.getNome() : null);
+            campoTelefone.setText(aluno != null ? aluno.getTelefone() : null);
+            campoEmail.setText(aluno != null ? aluno.getEmail() : null);
+        } else {
+            aluno = new Aluno();
+        }
     }
 
     private void configurarBotaoSalvar() {
         Button botaoSalvar = findViewById(R.id.activity_formulario_aluno_botao_salvar);
-        botaoSalvar.setOnClickListener(v -> {
-            Aluno novoAluno = criarAluno();
-            salvarAluno(novoAluno);
+        botaoSalvar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view){
+//                Aluno alunoCriado = preencherAluno();
+//                salvarAluno(alunoCriado);
+                preencherAluno();
+                alunoDAO.editar(aluno);
+                finish();
+            }
         });
     }
 
@@ -47,11 +65,13 @@ public class FormularioAlunoActivity extends AppCompatActivity {
         finish();
     }
 
-    private @NonNull Aluno criarAluno() {
+    private void preencherAluno() {
         String nome = campoNome.getText().toString();
         String telefone = campoTelefone.getText().toString();
         String email = campoEmail.getText().toString();
 
-        return new Aluno(nome, telefone, email);
+        aluno.setNome(nome);
+        aluno.setEmail(email);
+        aluno.setTelefone(telefone);
     }
 }
