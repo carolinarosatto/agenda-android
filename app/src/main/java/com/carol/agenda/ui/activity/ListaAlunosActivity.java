@@ -23,6 +23,7 @@ public class ListaAlunosActivity extends AppCompatActivity {
 
     private final AlunoDAO alunoDAO = new AlunoDAO();
     public static final String TITULO_APPBAR_LISTA = "Lista de alunos";
+    private ArrayAdapter<Aluno> adapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -57,13 +58,23 @@ public class ListaAlunosActivity extends AppCompatActivity {
 
         configuraAdapter(listaDeAlunos, buscarTodos);
         configuraClickPorItem(listaDeAlunos);
+        listaDeAlunos.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int posicao, long id) {
+                Aluno alunoSelecionado = (Aluno) adapterView.getItemAtPosition(posicao);
+                alunoDAO.remover(alunoSelecionado);
+                adapter.remove(alunoSelecionado);
+                return true;
+            }
+        });
     }
 
     private void configuraAdapter(ListView listaDeAlunos, List<Aluno> buscarTodos) {
-        listaDeAlunos.setAdapter(new ArrayAdapter<>(
+        adapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_1,
-                buscarTodos));
+                buscarTodos);
+        listaDeAlunos.setAdapter(adapter);
     }
 
     private void configuraClickPorItem(ListView listaDeAlunos) {
