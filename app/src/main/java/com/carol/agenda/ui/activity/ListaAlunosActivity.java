@@ -4,11 +4,14 @@ import static com.carol.agenda.ui.activity.ConstantesActivities.CHAVE_ALUNO;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,8 +19,6 @@ import com.carol.agenda.R;
 import com.carol.agenda.dao.AlunoDAO;
 import com.carol.agenda.model.Aluno;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import java.util.List;
 
 public class ListaAlunosActivity extends AppCompatActivity {
 
@@ -53,6 +54,27 @@ public class ListaAlunosActivity extends AppCompatActivity {
         atualizaAlunos();
     }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.activity_lista_alunos_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.activity_lista_alunos_menu_remover) {
+            AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+            if (menuInfo != null) {
+                Aluno alunoEscolhido = adapter.getItem(menuInfo.position);
+                removerAluno(alunoEscolhido);
+            }
+        }
+
+
+        return super.onContextItemSelected(item);
+    }
+
     private void atualizaAlunos() {
         adapter.clear();
         adapter.addAll(alunoDAO.getTodos());
@@ -63,15 +85,7 @@ public class ListaAlunosActivity extends AppCompatActivity {
 
         configuraAdapter(listaDeAlunos);
         configuraClickPorItem(listaDeAlunos);
-        configuraClickLongoPorItem(listaDeAlunos);
-    }
-
-    private void configuraClickLongoPorItem(ListView listaDeAlunos) {
-        listaDeAlunos.setOnItemLongClickListener((adapterView, view, posicao, id) -> {
-            Aluno alunoSelecionado = (Aluno) adapterView.getItemAtPosition(posicao);
-            removerAluno(alunoSelecionado);
-            return true;
-        });
+        registerForContextMenu(listaDeAlunos);
     }
 
     private void removerAluno(Aluno aluno) {
